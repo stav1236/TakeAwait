@@ -1,20 +1,17 @@
+import { Document, Types } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import GeoLocation from "src/common/models/GeoLocation";
 
-import GeoLocation from "src/shared/models/GeoLocation";
-
-import { Dish } from "../Dish/dish.interface";
-import { DishSchema } from "../Dish/dish.schema";
-
-@Schema()
-export class RestaurantSchema {
+@Schema({ collection: "restaurants" })
+export class Restaurant extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, type: Object, index: "2dsphere" })
   geoLocation: GeoLocation;
 
-  @Prop({ type: [{ type: DishSchema }] })
-  dishes: Dish[];
+  @Prop({ type: [Types.ObjectId], ref: "Dish" })
+  dishes: Types.ObjectId[];
 }
 
-export const RestaurantModel = SchemaFactory.createForClass(RestaurantSchema);
+export const RestaurantSchema = SchemaFactory.createForClass(Restaurant);

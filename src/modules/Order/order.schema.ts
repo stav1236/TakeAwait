@@ -1,18 +1,18 @@
+import { Document } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import { OrderDetails } from "./order-details.interface";
-import { OrderDetailsSchema } from "./order-details.schema";
 import { ORDER_STATUS, OrderStatus } from "./order.constants";
 
 @Schema()
-export class OrderSchema {
+export class Order extends Document {
   @Prop({ type: String, ref: "Restaurant" })
   restaurantId: string;
 
   @Prop()
   customerId: string;
 
-  @Prop({ type: [{ type: OrderDetailsSchema }] })
+  @Prop({ type: Object })
   details: OrderDetails[];
 
   @Prop()
@@ -28,4 +28,4 @@ export class OrderSchema {
   lastUpdated: Date;
 }
 
-export const OrderModel = SchemaFactory.createForClass(OrderSchema);
+export const OrderSchema = SchemaFactory.createForClass(Order);

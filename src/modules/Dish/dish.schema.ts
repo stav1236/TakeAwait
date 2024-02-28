@@ -1,9 +1,10 @@
+import { Document } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import { DISH_TYPE, DishType } from "./dish.constants";
 
-@Schema()
-export class DishSchema {
+@Schema({ collection: "dishes" })
+export class Dish extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -17,4 +18,4 @@ export class DishSchema {
   date: Date;
 }
 
-export const DishModel = SchemaFactory.createForClass(DishSchema);
+export const DishSchema = SchemaFactory.createForClass(Dish);
