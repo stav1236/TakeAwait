@@ -1,4 +1,4 @@
-import { Controller, Get } from "@nestjs/common";
+import { Controller, Get, ParseFloatPipe, Query } from "@nestjs/common";
 
 import { Restaurant } from "./restaurant.schema";
 import { RestaurantService } from "./restaurant.service";
@@ -8,7 +8,10 @@ export class RestaurantController {
   constructor(private readonly restaurantService: RestaurantService) {}
 
   @Get()
-  async findAll(): Promise<Restaurant[]> {
-    return this.restaurantService.findAll();
+  async findAll(
+    @Query("latitude", ParseFloatPipe) latitude: number,
+    @Query("longitude", ParseFloatPipe) longitude: number
+  ): Promise<Restaurant[]> {
+    return this.restaurantService.findAll(latitude, longitude);
   }
 }

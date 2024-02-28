@@ -1,4 +1,4 @@
-import { Document, Types, Schema as MongooseSchema } from "mongoose";
+import { Document, Types } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import GeoLocation from "src/common/models/GeoLocation";
 
@@ -7,7 +7,7 @@ export class Restaurant extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true, type: Object })
+  @Prop({ required: true, type: Object, index: "2dsphere" })
   geoLocation: GeoLocation;
 
   @Prop({ type: [Types.ObjectId], ref: "Dish" })

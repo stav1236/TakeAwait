@@ -11,7 +11,19 @@ export class RestaurantService {
     private readonly restaurantModel: Model<Restaurant>
   ) {}
 
-  async findAll(): Promise<Restaurant[]> {
-    return this.restaurantModel.find().populate("dishes").exec();
+  async findAll(latitude: number, longitude: number): Promise<Restaurant[]> {
+    return this.restaurantModel
+      .find({
+        geoLocation: {
+          $near: {
+            $geometry: {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            },
+          },
+        },
+      })
+      .populate("dishes")
+      .exec();
   }
 }
