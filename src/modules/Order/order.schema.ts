@@ -1,21 +1,25 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
 import { OrderDetails } from "./order-details.interface";
 import { ORDER_STATUS, OrderStatus } from "./order.constants";
+import { Restaurant } from "../Restaurant/restaurant.schema";
+import { Dish } from "../Dish/dish.schema";
 
 @Schema()
 export class Order extends Document {
-  @Prop({ type: String, ref: "Restaurant" })
-  restaurantId: string;
+  @Prop({ type: Types.ObjectId, ref: Restaurant.name, required: true })
+  restaurant: Types.ObjectId;
 
-  @Prop()
+  @Prop({ required: true })
   customerId: string;
 
-  @Prop({ type: Object })
+  @Prop({
+    type: [{ dish: { type: Types.ObjectId, ref: Dish.name }, amount: Number }],
+  })
   details: OrderDetails[];
 
-  @Prop()
+  @Prop({ default: 0 })
   cost: number;
 
   @Prop({
