@@ -1,6 +1,6 @@
-import { Dish } from "../Dish/dish.schema";
+import { Types } from "mongoose";
 
 export interface OrderDetails {
-  dish: Dish;
+  dish: Types.ObjectId;
   amount: number;
 }

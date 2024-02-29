@@ -8,6 +8,7 @@ import { DishModule } from "./modules/Dish/dish.module";
 import { RestaurantModule } from "./modules/Restaurant/restaurant.module";
 
 import config from "src/common/config/configuration";
+import { OrderModule } from "./modules/Order/order.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import config from "src/common/config/configuration";
     }),
     DishModule,
     RestaurantModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
