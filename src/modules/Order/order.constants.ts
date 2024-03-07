@@ -6,4 +6,4 @@ export const ORDER_STATUS = {
   cancelled: "בוטלה",
 } as const;
 
-export type OrderStatus = keyof typeof ORDER_STATUS;
+export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
