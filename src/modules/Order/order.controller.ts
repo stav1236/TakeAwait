@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common";
 
 import { OrderService } from "./order.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
+import { OrderStatus } from "./order.constants";
 
 @Controller("orders")
 export class OrderController {
@@ -16,5 +17,13 @@ export class OrderController {
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     const order = await this.orderService.create(createOrderDto);
     return { message: "Order created successfully", order };
+  }
+
+  @Put(":id/status/:newStatus")
+  async updateOrderStatus(
+    @Param("id") id: string,
+    @Param("newStatus") newStatus: OrderStatus
+  ) {
+    return this.orderService.updateOrderStatus(id, newStatus);
   }
 }

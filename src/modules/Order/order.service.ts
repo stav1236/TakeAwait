@@ -1,9 +1,14 @@
-import { Injectable } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { Order } from "./order.schema";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { Dish } from "../Dish/dish.schema";
+import { ORDER_STATUS, OrderStatus } from "./order.constants";
 
 @Injectable()
 export class OrderService {
@@ -42,5 +47,31 @@ export class OrderService {
 
     const createdOrder = new this.orderModel(orderData);
     return await createdOrder.save();
+  }
+
+  async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
+    if (status === ORDER_STATUS.arrived) {
+      const order = await this.orderModel.findById(id);
+
+      if (!order) {
+        throw new NotFoundException("Order not found");
+      }
+
+      if (order.status === ORDER_STATUS.cancelled) {
+        throw new BadRequestException("Invalid status transition");
+      }
+    }
+
+    const order = await this.orderModel.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      throw new NotFoundException("Order not found");
+    }
+
+    return order;
   }
 }
