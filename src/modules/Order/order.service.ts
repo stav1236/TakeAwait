@@ -74,4 +74,12 @@ export class OrderService {
 
     return order;
   }
+
+  async getOrdersByRestaurant(restaurantId: string): Promise<Order[]> {
+    const orders = await this.orderModel
+      .find({ restaurant: restaurantId })
+      .exec();
+
+    return orders;
+  }
 }

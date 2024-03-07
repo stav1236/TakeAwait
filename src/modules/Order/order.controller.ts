@@ -26,4 +26,9 @@ export class OrderController {
   ) {
     return this.orderService.updateOrderStatus(id, newStatus);
   }
+
+  @Get("restaurant/:restaurantId")
+  async getOrdersByRestaurant(@Param("restaurantId") restaurantId: string) {
+    return this.orderService.getOrdersByRestaurant(restaurantId);
+  }
 }
