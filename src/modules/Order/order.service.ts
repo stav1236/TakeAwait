@@ -82,4 +82,14 @@ export class OrderService {
 
     return orders;
   }
+
+  async getOrderStatus(id: string): Promise<OrderStatus> {
+    const order = await this.orderModel.findById(id).exec();
+
+    if (!order) {
+      throw new NotFoundException("Order not found");
+    }
+
+    return order.status;
+  }
 }
