@@ -9,6 +9,9 @@ import { RestaurantController } from "./restaurant.controller";
   providers: [RestaurantService],
   controllers: [RestaurantController],
   imports: [MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantSchema }])],
-  exports: [MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantSchema }])],
+  exports: [
+    MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantSchema }]),
+    RestaurantService,
+  ],
 })
 export class RestaurantModule {}

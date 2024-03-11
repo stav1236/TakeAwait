@@ -26,4 +26,8 @@ export class RestaurantService {
       .populate("dishes")
       .exec();
   }
+
+  async getAllRestaurantsNames() {
+    return await this.restaurantModel.find({}, { name: 1 });
+  }
 }

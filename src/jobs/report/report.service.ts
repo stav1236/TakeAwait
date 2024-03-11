@@ -6,13 +6,11 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { Restaurant } from "src/modules/Restaurant/restaurant.schema";
+import { RestaurantService } from "src/modules/Restaurant/restaurant.service";
 
 @Injectable()
 export class ReportService {
-  constructor(
-    @InjectModel(Restaurant.name)
-    private readonly restaurantModel: Model<Restaurant>
-  ) {}
+  constructor(private readonly restaurantService: RestaurantService) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
   async createFolder(): Promise<void> {
@@ -28,10 +26,11 @@ export class ReportService {
       .replace(/:/g, "-");
 
     const reportFolderName = `assets/reports/${timestamp}`;
-    const restaurantsNames = await this.restaurantModel.find({}, { _id: 0, name: 1 });
+
+    const restaurantsNames = await this.restaurantService.getAllRestaurantsNames();
 
     try {
-      fs.mkdirSync(reportFolderName, { recursive: true });
+      // fs.mkdirSync(reportFolderName, { recursive: true });
 
       restaurantsNames.forEach((restaurant) => {
         try {
