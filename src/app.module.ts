@@ -18,6 +18,7 @@ import { ReportModule } from "./jobs/report/report.module";
     ConfigModule.forRoot({
       isGlobal: true,
       load: [config],
+      envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
