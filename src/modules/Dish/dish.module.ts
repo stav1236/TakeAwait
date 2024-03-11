@@ -8,11 +8,7 @@ import { DishController } from "./dish.controller";
 @Module({
   providers: [DishService],
   controllers: [DishController],
-  imports: [
-    MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }]),
-  ],
-  exports: [
-    MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }])],
+  exports: [MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }])],
 })
 export class DishModule {}

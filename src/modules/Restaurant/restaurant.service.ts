@@ -18,12 +18,16 @@ export class RestaurantService {
           $near: {
             $geometry: {
               type: "Point",
-              coordinates: [longitude, latitude],
+              coordinates: [latitude, longitude],
             },
           },
         },
       })
       .populate("dishes")
       .exec();
+  }
+
+  async getAllRestaurantsNames() {
+    return await this.restaurantModel.find({}, { name: 1 });
   }
 }

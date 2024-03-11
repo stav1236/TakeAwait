@@ -7,11 +7,9 @@ import { OrderService } from "./order.service";
 import { DishModule } from "../Dish/dish.module";
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]),
-    DishModule,
-  ],
+  imports: [MongooseModule.forFeature([{ name: Order.name, schema: OrderSchema }]), DishModule],
   controllers: [OrderController],
   providers: [OrderService],
+  exports: [OrderService],
 })
 export class OrderModule {}
