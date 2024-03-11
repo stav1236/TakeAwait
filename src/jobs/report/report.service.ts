@@ -1,8 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Cron, CronExpression } from "@nestjs/schedule";
 import * as fs from "fs";
 import { Model } from "mongoose";
+
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { Injectable } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+
 import { Restaurant } from "src/modules/Restaurant/restaurant.schema";
 
 @Injectable()
@@ -12,7 +14,7 @@ export class ReportService {
     private readonly restaurantModel: Model<Restaurant>
   ) {}
 
-  @Cron("*/30 * * * * *")
+  @Cron(CronExpression.EVERY_MINUTE)
   async createFolder(): Promise<void> {
     const timestamp = new Date()
       .toLocaleString("he-IL", {
@@ -28,14 +30,26 @@ export class ReportService {
     const reportFolderName = `assets/reports/${timestamp}`;
     const restaurantsNames = await this.restaurantModel.find({}, { _id: 0, name: 1 });
 
-    restaurantsNames.forEach((restaurant) => {
-      try {
-        const restaurantReportFolderName = `${reportFolderName}/${restaurant.name}`;
-        // fs.mkdirSync(restaurantReportFolderName, { recursive: true });
-        console.log(`Folder "${restaurantReportFolderName}" created successfully.`);
-      } catch (error) {
-        console.error(`Error creating folder: ${error}`);
-      }
-    });
+    try {
+      fs.mkdirSync(reportFolderName, { recursive: true });
+
+      restaurantsNames.forEach((restaurant) => {
+        try {
+          const restaurantReportFileName = `${reportFolderName}/${restaurant.name}.json`;
+          const jsonData = JSON.stringify({
+            ordersAmount: 999,
+            avgCost: 999,
+            cancelsAmount: 999,
+          });
+
+          // fs.writeFileSync(restaurantReportFileName, jsonData);
+          console.log(`file report "${restaurantReportFileName}" created successfully.`);
+        } catch (error) {
+          console.error(`Error creating file: ${error}`);
+        }
+      });
+    } catch (error) {
+      console.error(`Error creating folder: ${error}`);
+    }
   }
 }
