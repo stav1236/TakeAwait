@@ -18,7 +18,7 @@ export class RestaurantService {
           $near: {
             $geometry: {
               type: "Point",
-              coordinates: [longitude, latitude],
+              coordinates: [latitude, longitude],
             },
           },
         },
