@@ -1,10 +1,10 @@
 import { Document, Types } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-import { OrderDetails } from "./order-details.interface";
-import { ORDER_STATUS, OrderStatus } from "./order.constants";
-import { Restaurant } from "../Restaurant/restaurant.schema";
 import { Dish } from "../Dish/dish.schema";
+import { OrderStatus } from "./models/order.enums";
+import { Restaurant } from "../Restaurant/restaurant.schema";
+import { OrderDetails } from "./models/order-details.interface";
 
 @Schema()
 export class Order extends Document {
@@ -15,7 +15,13 @@ export class Order extends Document {
   customerId: string;
 
   @Prop({
-    type: [{ dish: { type: Types.ObjectId, ref: Dish.name }, amount: Number }],
+    type: [
+      {
+        _id: false,
+        dish: { type: Types.ObjectId, ref: Dish.name },
+        amount: Number,
+      },
+    ],
   })
   details: OrderDetails[];
 
@@ -23,8 +29,8 @@ export class Order extends Document {
   cost: number;
 
   @Prop({
-    enum: Object.values(ORDER_STATUS),
-    default: ORDER_STATUS.paid,
+    enum: OrderStatus,
+    default: OrderStatus.PAID,
   })
   status: OrderStatus;
 
