@@ -14,6 +14,6 @@ export class RestaurantController {
     @Query("latitude", ParseFloatPipe) latitude: number,
     @Query("longitude", ParseFloatPipe) longitude: number
   ): Promise<Restaurant[]> {
-    return await this.restaurantService.findAll(latitude, longitude);
+    return this.restaurantService.findAll(latitude, longitude);
   }
 }
