@@ -5,7 +5,7 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 
 import { OrderService } from "src/modules/Order/order.service";
 import { RestaurantService } from "src/modules/Restaurant/restaurant.service";
-import { getDateWithTimeString } from "src/common/utilities/dataUtils";
+import { getDateWithTimeString } from "src/common/utilities/data-utils";
 
 @Injectable()
 export class ReportService {

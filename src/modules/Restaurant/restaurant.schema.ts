@@ -1,6 +1,6 @@
 import { Document, Types } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import GeoLocation from "src/common/models/GeoLocation";
+import GeoLocation from "src/common/models/geo-location";
 import { Dish } from "../Dish/dish.schema";
 
 @Schema({ collection: "restaurants" })
