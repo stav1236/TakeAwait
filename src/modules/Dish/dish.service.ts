@@ -26,4 +26,13 @@ export class DishService {
       },
     ]);
   }
+
+  async getDishesPrices(dishIds: string[]): Promise<{ [key: string]: number }> {
+    const dishesPrices = await this.dishModel.find({ _id: { $in: dishIds } }, { cost: 1 });
+
+    return dishesPrices.reduce((map, dish) => {
+      map[dish._id] = dish.cost;
+      return map;
+    }, {});
+  }
 }

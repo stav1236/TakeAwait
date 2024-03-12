@@ -1,34 +1,30 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+
 import { Order } from "./order.schema";
+import { DishService } from "../Dish/dish.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
-import { Dish } from "../Dish/dish.schema";
 import { ORDER_STATUS, OrderStatus } from "./order.constants";
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
-    @InjectModel(Dish.name) private dishModel: Model<Dish>
+    private readonly dishService: DishService
   ) {}
 
-  async getAllOrders(): Promise<any[]> {
-    return this.orderModel.find().populate("details.dish").select("-details._id").exec(); //todo _id
+  async getAllOrders(): Promise<Order[]> {
+    return this.orderModel.find().populate("details.dish").exec();
   }
 
   async create(createOrderDto: CreateOrderDto) {
     const dishIds = createOrderDto.details.map((detail) => detail.dish);
 
-    const fetchedDishes = await this.dishModel.find({ _id: { $in: dishIds } }, { cost: 1 });//todo service aggregation
-
-    const priceMap = fetchedDishes.reduce((map, dish) => {
-      map[dish._id] = dish.cost;
-      return map;
-    }, {});
+    const dishesPrices = this.dishService.getDishesPrices(dishIds);
 
     const totalCost = createOrderDto.details.reduce((acc, detail) => {
-      const price = priceMap[detail.dish] ?? 0;
+      const price = dishesPrices[detail.dish] ?? 0;
       return acc + price * detail.amount;
     }, 0);
 
@@ -40,7 +36,7 @@ export class OrderService {
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
     if (status === ORDER_STATUS.arrived) {
-      const order = await this.orderModel.findById(id);//todo
+      const order = await this.orderModel.findById(id); //todo
 
       if (!order) {
         throw new NotFoundException("Order not found");
@@ -67,7 +63,7 @@ export class OrderService {
   }
 
   async getOrderStatus(id: string): Promise<OrderStatus> {
-    const order = await this.orderModel.findById(id).exec();//todo
+    const order = await this.orderModel.findById(id).exec(); //todo
 
     if (!order) {
       throw new NotFoundException("Order not found");
@@ -77,7 +73,7 @@ export class OrderService {
   }
 
   async getAmountOfOrdersToDay(restaurantId: string, curDate: Date): Promise<number> {
-    const startOfDay = new Date(curDate);//todo change funcation name
+    const startOfDay = new Date(curDate); //todo change funcation name
     startOfDay.setHours(0, 0, 0, 0);
 
     const count = await this.orderModel
