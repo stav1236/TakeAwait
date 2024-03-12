@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-import { DISH_TYPE, DishType } from "./dish.constants";
+import { DishType } from "./models/dish.enums";
 
 @Schema({ collection: "dishes" })
 export class Dish extends Document {
@@ -11,7 +11,7 @@ export class Dish extends Document {
   @Prop({ required: true })
   cost: number;
 
-  @Prop({ required: true, enum: Object.values(DISH_TYPE) })
+  @Prop({ required: true, enum: DishType })
   type: DishType;
 
   @Prop({ default: Date.now })

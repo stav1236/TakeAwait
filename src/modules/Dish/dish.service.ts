@@ -3,14 +3,14 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
 import { Dish } from "./dish.schema";
-import { DishType } from "./dish.constants";
+import { DishesByType } from "./models/dishes-by-type.interface";
 
 @Injectable()
 export class DishService {
   constructor(@InjectModel(Dish.name) private dishModel: Model<Dish>) {}
 
-  async getAllDishesGroupedByType(): Promise<{ [key in DishType]?: Dish[] }> {
-    const groupedDishes = await this.dishModel.aggregate([ //todo type
+  async getAllDishesGroupedByType(): Promise<DishesByType[]> {
+    return await this.dishModel.aggregate<DishesByType>([
       {
         $group: {
           _id: "$type",
@@ -25,12 +25,5 @@ export class DishService {
         },
       },
     ]);
-
-    const result: { [key in DishType]?: Dish[] } = {}; //todo remove
-    groupedDishes.forEach((group) => {
-      result[group.type] = group.dishes;
-    });
-
-    return result;
   }
 }
