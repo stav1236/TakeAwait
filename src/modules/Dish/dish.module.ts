@@ -9,6 +9,6 @@ import { DishController } from "./dish.controller";
   providers: [DishService],
   controllers: [DishController],
   imports: [MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }])],
-  exports: [MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }])],
+  exports: [MongooseModule.forFeature([{ name: Dish.name, schema: DishSchema }])], //todo service
 })
 export class DishModule {}

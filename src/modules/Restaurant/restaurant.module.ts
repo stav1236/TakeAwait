@@ -10,7 +10,7 @@ import { RestaurantController } from "./restaurant.controller";
   controllers: [RestaurantController],
   imports: [MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantSchema }])],
   exports: [
-    MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantSchema }]),
+    MongooseModule.forFeature([{ name: Restaurant.name, schema: RestaurantSchema }]),//todo
     RestaurantService,
   ],
 })

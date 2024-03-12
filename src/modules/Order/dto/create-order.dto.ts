@@ -16,7 +16,7 @@ export class CreateOrderDto {
       { dish: "65dda763a21179b83293aa51", amount: 1 },
     ],
   })
-  details: { dish: string; amount: number }[];
+  details: { dish: string; amount: number }[]; //todo dto
 
   @ApiProperty({
     description:
