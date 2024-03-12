@@ -14,10 +14,10 @@ import { ReportModule } from "./jobs/report/report.module";
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(),
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [config],
+    ScheduleModule.forRoot(), // TODO: לבדוק
+    ConfigModule.forRoot({ //todo
+      isGlobal: true, //todo
+      load: [config], //todo
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     MongooseModule.forRootAsync({

@@ -10,7 +10,7 @@ export class DishService {
   constructor(@InjectModel(Dish.name) private dishModel: Model<Dish>) {}
 
   async getAllDishesGroupedByType(): Promise<{ [key in DishType]?: Dish[] }> {
-    const groupedDishes = await this.dishModel.aggregate([
+    const groupedDishes = await this.dishModel.aggregate([ //todo type
       {
         $group: {
           _id: "$type",
@@ -26,7 +26,7 @@ export class DishService {
       },
     ]);
 
-    const result: { [key in DishType]?: Dish[] } = {};
+    const result: { [key in DishType]?: Dish[] } = {}; //todo remove
     groupedDishes.forEach((group) => {
       result[group.type] = group.dishes;
     });

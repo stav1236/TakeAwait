@@ -1,4 +1,4 @@
-export const DISH_TYPE = {
+export const DISH_TYPE = { //todo to enum
   vegetarian: "צמחוני",
   vegan: "טבעוני",
   meat: "בשרי",

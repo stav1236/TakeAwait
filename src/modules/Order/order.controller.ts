@@ -5,20 +5,22 @@ import { OrderService } from "./order.service";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { OrderStatus } from "./order.constants";
 
+//todo more type
+
 @ApiTags("Orders")
 @Controller("orders")
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get()
-  async getAllOrders(): Promise<any[]> {
+  async getAllOrders(): Promise<any[]> {//todo
     return this.orderService.getAllOrders();
   }
 
   @Post()
   async createOrder(@Body() createOrderDto: CreateOrderDto) {
     const order = await this.orderService.create(createOrderDto);
-    return { message: "Order created successfully", order };
+    return { message: "Order created successfully", order };//todo
   }
 
   @Put(":id/status/:newStatus")

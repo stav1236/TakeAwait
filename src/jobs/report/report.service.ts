@@ -14,7 +14,7 @@ export class ReportService {
     private readonly restaurantService: RestaurantService
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_10_HOURS)
   async createFolder(): Promise<void> {
     const curDate = new Date();
     const timeString = getDateWithTimeString(curDate);
@@ -24,22 +24,22 @@ export class ReportService {
     try {
       fs.mkdirSync(reportFolderName, { recursive: true });
 
-      const promises = restaurantsNames.map(async (restaurant) => {
-        try {
-          const restaurantReportFileName = `${reportFolderName}/${restaurant.name}.json`;
-          const orderData = await this.orderService.calcTodayOrdersReport(
-            restaurant._id.toString(),
-            curDate
-          );
+      await Promise.all(
+        restaurantsNames.map(async (restaurant) => {
+          try {
+            const restaurantReportFileName = `${reportFolderName}/${restaurant.name}.json`;
+            const orderData = await this.orderService.calcTodayOrdersReport(
+              restaurant._id.toString(),
+              curDate
+            );
 
-          fs.writeFileSync(restaurantReportFileName, JSON.stringify(orderData));
-          console.log(`File report "${restaurantReportFileName}" created successfully.`);
-        } catch (error) {
-          console.error(`Error creating file: ${error}`);
-        }
-      });
-
-      await Promise.all(promises);
+            fs.writeFileSync(restaurantReportFileName, JSON.stringify(orderData));
+            console.log(`File report "${restaurantReportFileName}" created successfully.`);
+          } catch (error) {
+            console.error(`Error creating file: ${error}`);
+          }
+        })
+      );
     } catch (error) {
       console.error(`Error creating folder: ${error}`);
     }

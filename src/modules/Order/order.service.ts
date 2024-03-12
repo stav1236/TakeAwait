@@ -14,13 +14,13 @@ export class OrderService {
   ) {}
 
   async getAllOrders(): Promise<any[]> {
-    return this.orderModel.find().populate("details.dish").select("-details._id").exec();
+    return this.orderModel.find().populate("details.dish").select("-details._id").exec(); //todo _id
   }
 
   async create(createOrderDto: CreateOrderDto) {
     const dishIds = createOrderDto.details.map((detail) => detail.dish);
 
-    const fetchedDishes = await this.dishModel.find({ _id: { $in: dishIds } }, { cost: 1 });
+    const fetchedDishes = await this.dishModel.find({ _id: { $in: dishIds } }, { cost: 1 });//todo service aggregation
 
     const priceMap = fetchedDishes.reduce((map, dish) => {
       map[dish._id] = dish.cost;
@@ -40,7 +40,7 @@ export class OrderService {
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
     if (status === ORDER_STATUS.arrived) {
-      const order = await this.orderModel.findById(id);
+      const order = await this.orderModel.findById(id);//todo
 
       if (!order) {
         throw new NotFoundException("Order not found");
@@ -67,7 +67,7 @@ export class OrderService {
   }
 
   async getOrderStatus(id: string): Promise<OrderStatus> {
-    const order = await this.orderModel.findById(id).exec();
+    const order = await this.orderModel.findById(id).exec();//todo
 
     if (!order) {
       throw new NotFoundException("Order not found");
@@ -77,7 +77,7 @@ export class OrderService {
   }
 
   async getAmountOfOrdersToDay(restaurantId: string, curDate: Date): Promise<number> {
-    const startOfDay = new Date(curDate);
+    const startOfDay = new Date(curDate);//todo change funcation name
     startOfDay.setHours(0, 0, 0, 0);
 
     const count = await this.orderModel
