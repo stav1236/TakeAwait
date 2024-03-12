@@ -119,7 +119,7 @@ export class OrderService {
     curDate: Date
   ): Promise<{
     ordersAmount: number;
-    avgCost: any;
+    avgCost: number;
     cancelledAmount: number;
   }> {
     const startOfDay = new Date(curDate);
