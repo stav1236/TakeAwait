@@ -94,7 +94,7 @@ export class OrderService {
       .exec();
 
     if (aggregationResult.length > 0) {
-      return aggregationResult[0].averageCost;
+      return aggregationResult[0].averageCost as number;
     } else {
       return 0;
     }
@@ -114,7 +114,14 @@ export class OrderService {
       .exec();
   }
 
-  async calcTodayOrdersReport(restaurantId: string, curDate: Date) {
+  async calcTodayOrdersReport(
+    restaurantId: string,
+    curDate: Date
+  ): Promise<{
+    ordersAmount: number;
+    avgCost: any;
+    cancelledAmount: number;
+  }> {
     const startOfDay = new Date(curDate);
     startOfDay.setHours(0, 0, 0, 0);
 
