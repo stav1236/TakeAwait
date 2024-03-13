@@ -1,11 +1,16 @@
+import { Type } from "class-transformer";
 import { ApiProperty } from "@nestjs/swagger";
-import { Dish } from "src/modules/Dish/dish.schema";
+import { IsMongoId, IsNotEmpty, IsNumberString, ValidateNested } from "class-validator";
+
+import { OrderDetailsDto } from "./order-details.dto";
 
 export class CreateOrderDto {
   @ApiProperty({
     description: "The ID of the customer who is placing the order",
     example: "1234567890",
   })
+  @IsNotEmpty()
+  @IsNumberString()
   customerId: string;
 
   @ApiProperty({
@@ -16,12 +21,16 @@ export class CreateOrderDto {
       { dish: "65dda763a21179b83293aa51", amount: 1 },
     ],
   })
-  details: { dish: string; amount: number }[]; //todo dto
+  @IsNotEmpty()
+  @ValidateNested({ each: true })
+  @Type(() => OrderDetailsDto)
+  details: OrderDetailsDto[];
 
   @ApiProperty({
-    description:
-      "The ID of the restaurant from which the order is being placed",
+    description: "The ID of the restaurant from which the order is being placed",
     example: "65ddad2ea21179b83293aa6a",
   })
+  @IsMongoId()
+  @IsNotEmpty()
   restaurant: string;
 }

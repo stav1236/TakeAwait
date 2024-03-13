@@ -1,11 +1,15 @@
 import { NestFactory } from "@nestjs/core";
+import { ConfigService } from "@nestjs/config";
 
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { ConfigService } from "@nestjs/config";
+import { globalValidationPipe } from "./common/pipes/validation.pipe";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.useGlobalPipes(globalValidationPipe);
+
   const configService = app.get(ConfigService);
 
   const config = new DocumentBuilder()
