@@ -4,11 +4,13 @@ import { ConfigService } from "@nestjs/config";
 import { AppModule } from "./app.module";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { globalValidationPipe } from "./common/pipes/validation.pipe";
+import { TakeAwaitExceptionFilter } from "./common/exceptions/take-await-exception-filter";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(globalValidationPipe);
+  app.useGlobalFilters(new TakeAwaitExceptionFilter());
 
   const configService = app.get(ConfigService);
 
