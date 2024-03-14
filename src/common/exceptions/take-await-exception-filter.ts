@@ -19,12 +19,12 @@ export class TakeAwaitExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status =
+    const status: number =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const absoluteFilePath = exception.stack.split("\n")[1].split("(")[1].split(")")[0];
-    const srcIndex = absoluteFilePath.indexOf("src");
-    const relativeFilePath =
+    const absoluteFilePath: string = exception.stack.split("\n")[1].split("(")[1].split(")")[0];
+    const srcIndex: number = absoluteFilePath.indexOf("src");
+    const relativeFilePath: string =
       srcIndex !== -1 ? absoluteFilePath.substring(srcIndex) : absoluteFilePath;
 
     const errorResponse = {

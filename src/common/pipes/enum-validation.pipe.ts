@@ -6,7 +6,7 @@ export class EnumValidationPipe implements PipeTransform {
 
   transform(value: any, metadata: ArgumentMetadata) {
     if (!this.isValidEnumValue(value)) {
-      const variableName = metadata.data;
+      const variableName: string = metadata.data;
       throw new BadRequestException(
         `${variableName} is not include in ${Object.values(this.enumType)}`
       );

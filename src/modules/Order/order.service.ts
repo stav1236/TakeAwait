@@ -6,6 +6,7 @@ import { Order } from "./order.schema";
 import { OrderStatus } from "./models/order.enums";
 import { DishService } from "../Dish/dish.service";
 import { CreateOrderDto } from "./models/dto/create-order.dto";
+import { OrderCreationDto } from "./models/dto/order-creation.dto";
 
 @Injectable()
 export class OrderService {
@@ -19,29 +20,32 @@ export class OrderService {
   }
 
   async create(createOrderDto: CreateOrderDto): Promise<Order> {
-    const dishIds = createOrderDto.details.map((detail) => detail.dish);
+    const dishIds: string[] = createOrderDto.details.map((detail) => detail.dish);
 
-    const dishesPrices = this.dishService.getDishesPrices(dishIds);
+    const dishesPrices: Record<string, number> = await this.dishService.getDishesPrices(dishIds);
 
-    const totalCost = createOrderDto.details.reduce((acc, detail) => {
-      const price = dishesPrices[detail.dish] ?? 0;
+    const totalCost: number = createOrderDto.details.reduce((acc, detail) => {
+      const price: number = dishesPrices[detail.dish] ?? 0;
       return acc + price * detail.amount;
     }, 0);
 
-    const orderData = { ...createOrderDto, cost: totalCost };
+    const orderData: OrderCreationDto = { ...createOrderDto, cost: totalCost };
 
-    const createdOrder = new this.orderModel(orderData);
+    const createdOrder: Order = new this.orderModel(orderData);
     return await createdOrder.save();
   }
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
-    const order = await this.orderModel.findById(id);
+    const order: Order = await this.orderModel.findById(id);
     if (!order) {
       throw new NotFoundException("Order not found");
     }
+
     if (status === OrderStatus.ARRIVED && order.status === OrderStatus.CANCELLED) {
       throw new BadRequestException("Invalid status transition");
     }
+
+    order.status = status;
 
     return await order.save();
   }
@@ -51,7 +55,7 @@ export class OrderService {
   }
 
   async getOrderStatus(id: string): Promise<OrderStatus> {
-    const order = await this.orderModel.findById(id, { status: 1 }).exec();
+    const order: Order = await this.orderModel.findById(id, { status: 1 }).exec();
 
     if (!order) {
       throw new NotFoundException("Order not found");
@@ -114,20 +118,13 @@ export class OrderService {
       .exec();
   }
 
-  async calcTodayOrdersReport(
-    restaurantId: string,
-    curDate: Date
-  ): Promise<{
-    ordersAmount: number;
-    avgCost: number;
-    cancelledAmount: number;
-  }> {
+  async calcTodayOrdersReport(restaurantId: string, curDate: Date): Promise<RestaurantReport> {
     const startOfDay = new Date(curDate);
     startOfDay.setHours(0, 0, 0, 0);
 
-    const ordersAmount = await this.getAmountOfOrders(restaurantId, startOfDay, curDate);
-    const avgCost = await this.calcAvgCostOfOrder(restaurantId, startOfDay, curDate);
-    const cancelledAmount = await this.getAmountOfCancelledOrders(
+    const ordersAmount: number = await this.getAmountOfOrders(restaurantId, startOfDay, curDate);
+    const avgCost: number = await this.calcAvgCostOfOrder(restaurantId, startOfDay, curDate);
+    const cancelledAmount: number = await this.getAmountOfCancelledOrders(
       restaurantId,
       startOfDay,
       curDate

@@ -5,7 +5,7 @@ import { PipeTransform, Injectable, BadRequestException, ArgumentMetadata } from
 export class MongoIdPipe implements PipeTransform<string, Types.ObjectId> {
   transform(value: string, metadata: ArgumentMetadata): Types.ObjectId {
     if (!Types.ObjectId.isValid(value)) {
-      const variableName = metadata.data;
+      const variableName: string = metadata.data;
 
       throw new BadRequestException(`${variableName} is invalid ObjectId`);
     }

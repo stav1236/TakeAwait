@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import { Types } from "mongoose";
 
 import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
@@ -21,7 +22,8 @@ export class ReportService {
     const curDate = new Date();
     const timeString = getDateWithTimeString(curDate);
     const reportFolderName = `assets/reports/${timeString}`;
-    const restaurantsNames = await this.restaurantService.getAllRestaurantsNames();
+    const restaurantsNames: { _id: Types.ObjectId; name: string }[] =
+      await this.restaurantService.getAllRestaurantsNames();
 
     try {
       fs.mkdirSync(reportFolderName, { recursive: true });
@@ -30,7 +32,7 @@ export class ReportService {
         restaurantsNames.map(async (restaurant) => {
           try {
             const restaurantReportFileName = `${reportFolderName}/${restaurant.name}.json`;
-            const orderData = await this.orderService.calcTodayOrdersReport(
+            const orderData: RestaurantReport = await this.orderService.calcTodayOrdersReport(
               restaurant._id.toString(),
               curDate
             );
