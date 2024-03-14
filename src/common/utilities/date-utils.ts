@@ -1,4 +1,4 @@
-export const getDateWithTimeString = (date: Date) => {
+export const getDateWithTimeString = (date: Date): string => {
   return date
     .toLocaleString("he-IL", {
       year: "numeric",

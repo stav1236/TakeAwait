@@ -1,4 +1,4 @@
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 
@@ -27,7 +27,7 @@ export class RestaurantService {
       .exec();
   }
 
-  async getAllRestaurantsNames() {
+  async getAllRestaurantsNames(): Promise<{ _id: Types.ObjectId; name: string }[]> {
     return await this.restaurantModel.find({}, { name: 1 });
   }
 }

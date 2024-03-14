@@ -1,73 +1,61 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Model } from "mongoose";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+
 import { Order } from "./order.schema";
-import { CreateOrderDto } from "./dto/create-order.dto";
-import { Dish } from "../Dish/dish.schema";
-import { ORDER_STATUS, OrderStatus } from "./order.constants";
+import { OrderStatus } from "./models/order.enums";
+import { DishService } from "../Dish/dish.service";
+import { CreateOrderDto } from "./models/dto/create-order.dto";
+import { OrderCreationDto } from "./models/dto/order-creation.dto";
 
 @Injectable()
 export class OrderService {
   constructor(
     @InjectModel(Order.name) private orderModel: Model<Order>,
-    @InjectModel(Dish.name) private dishModel: Model<Dish>
+    private readonly dishService: DishService
   ) {}
 
-  async getAllOrders(): Promise<any[]> {
-    return this.orderModel.find().populate("details.dish").select("-details._id").exec(); //todo _id
+  async getAllOrders(): Promise<Order[]> {
+    return this.orderModel.find().populate("details.dish").exec();
   }
 
-  async create(createOrderDto: CreateOrderDto) {
-    const dishIds = createOrderDto.details.map((detail) => detail.dish);
+  async create(createOrderDto: CreateOrderDto): Promise<Order> {
+    const dishIds: string[] = createOrderDto.details.map((detail) => detail.dish);
 
-    const fetchedDishes = await this.dishModel.find({ _id: { $in: dishIds } }, { cost: 1 });//todo service aggregation
+    const dishesPrices: Record<string, number> = await this.dishService.getDishesPrices(dishIds);
 
-    const priceMap = fetchedDishes.reduce((map, dish) => {
-      map[dish._id] = dish.cost;
-      return map;
-    }, {});
-
-    const totalCost = createOrderDto.details.reduce((acc, detail) => {
-      const price = priceMap[detail.dish] ?? 0;
+    const totalCost: number = createOrderDto.details.reduce((acc, detail) => {
+      const price: number = dishesPrices[detail.dish] ?? 0;
       return acc + price * detail.amount;
     }, 0);
 
-    const orderData = { ...createOrderDto, cost: totalCost };
+    const orderData: OrderCreationDto = { ...createOrderDto, cost: totalCost };
 
-    const createdOrder = new this.orderModel(orderData);
+    const createdOrder: Order = new this.orderModel(orderData);
     return await createdOrder.save();
   }
 
   async updateOrderStatus(id: string, status: OrderStatus): Promise<Order> {
-    if (status === ORDER_STATUS.arrived) {
-      const order = await this.orderModel.findById(id);//todo
-
-      if (!order) {
-        throw new NotFoundException("Order not found");
-      }
-
-      if (order.status === ORDER_STATUS.cancelled) {
-        throw new BadRequestException("Invalid status transition");
-      }
-    }
-
-    const order = await this.orderModel.findByIdAndUpdate(id, { status }, { new: true });
-
+    const order: Order = await this.orderModel.findById(id);
     if (!order) {
       throw new NotFoundException("Order not found");
     }
 
-    return order;
+    if (status === OrderStatus.ARRIVED && order.status === OrderStatus.CANCELLED) {
+      throw new BadRequestException("Invalid status transition");
+    }
+
+    order.status = status;
+
+    return await order.save();
   }
 
   async getOrdersByRestaurant(restaurantId: string): Promise<Order[]> {
-    const orders = await this.orderModel.find({ restaurant: restaurantId }).exec();
-
-    return orders;
+    return await this.orderModel.find({ restaurant: restaurantId }).exec();
   }
 
   async getOrderStatus(id: string): Promise<OrderStatus> {
-    const order = await this.orderModel.findById(id).exec();//todo
+    const order: Order = await this.orderModel.findById(id, { status: 1 }).exec();
 
     if (!order) {
       throw new NotFoundException("Order not found");
@@ -76,30 +64,22 @@ export class OrderService {
     return order.status;
   }
 
-  async getAmountOfOrdersToDay(restaurantId: string, curDate: Date): Promise<number> {
-    const startOfDay = new Date(curDate);//todo change funcation name
-    startOfDay.setHours(0, 0, 0, 0);
-
-    const count = await this.orderModel
+  async getAmountOfOrders(restaurantId: string, startDate: Date, endDate: Date): Promise<number> {
+    return await this.orderModel
       .countDocuments({
         restaurant: restaurantId,
-        lastUpdated: { $gte: startOfDay, $lte: curDate },
+        lastUpdated: { $gte: startDate, $lte: endDate },
       })
       .exec();
-
-    return count;
   }
 
-  async calcAvgCostOfOrderToDay(restaurantId: string, curDate: Date) {
-    const startOfDay = new Date(curDate);
-    startOfDay.setHours(0, 0, 0, 0);
-
+  async calcAvgCostOfOrder(restaurantId: string, startDate: Date, endDate: Date) {
     const aggregationResult = await this.orderModel
       .aggregate([
         {
           $match: {
             restaurant: restaurantId,
-            lastUpdated: { $gte: startOfDay, $lte: curDate },
+            lastUpdated: { $gte: startDate, $lte: endDate },
           },
         },
         {
@@ -118,30 +98,37 @@ export class OrderService {
       .exec();
 
     if (aggregationResult.length > 0) {
-      return aggregationResult[0].averageCost;
+      return aggregationResult[0].averageCost as number;
     } else {
       return 0;
     }
   }
 
-  async getAmountOfCancelledOrdersToDay(restaurantId: string, curDate: Date): Promise<number> {
+  async getAmountOfCancelledOrders(
+    restaurantId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<number> {
+    return await this.orderModel
+      .countDocuments({
+        restaurant: restaurantId,
+        lastUpdated: { $gte: startDate, $lte: endDate },
+        status: OrderStatus.CANCELLED,
+      })
+      .exec();
+  }
+
+  async calcTodayOrdersReport(restaurantId: string, curDate: Date): Promise<RestaurantReport> {
     const startOfDay = new Date(curDate);
     startOfDay.setHours(0, 0, 0, 0);
 
-    const count = await this.orderModel
-      .countDocuments({
-        restaurant: restaurantId,
-        lastUpdated: { $gte: startOfDay, $lte: curDate },
-        status: ORDER_STATUS.cancelled,
-      })
-      .exec();
-
-    return count;
-  }
-  async calcTodayOrdersReport(restaurantId: string, curDate: Date) {
-    const ordersAmount = await this.getAmountOfOrdersToDay(restaurantId, curDate);
-    const avgCost = await this.calcAvgCostOfOrderToDay(restaurantId, curDate);
-    const cancelledAmount = await this.getAmountOfCancelledOrdersToDay(restaurantId, curDate);
+    const ordersAmount: number = await this.getAmountOfOrders(restaurantId, startOfDay, curDate);
+    const avgCost: number = await this.calcAvgCostOfOrder(restaurantId, startOfDay, curDate);
+    const cancelledAmount: number = await this.getAmountOfCancelledOrders(
+      restaurantId,
+      startOfDay,
+      curDate
+    );
 
     return {
       ordersAmount,

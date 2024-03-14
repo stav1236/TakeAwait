@@ -1,23 +1,22 @@
-import { Module } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 
-import { AppService } from "./app.service";
-import { AppController } from "./app.controller";
 import { DishModule } from "./modules/Dish/dish.module";
 import { RestaurantModule } from "./modules/Restaurant/restaurant.module";
 
 import config from "src/common/config/configuration";
 import { OrderModule } from "./modules/Order/order.module";
 import { ReportModule } from "./jobs/report/report.module";
+import { RequestLoggingMiddleware } from "./common/middlewares/request-logging.middleware";
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(), // TODO: לבדוק
-    ConfigModule.forRoot({ //todo
-      isGlobal: true, //todo
-      load: [config], //todo
+    ScheduleModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
     MongooseModule.forRootAsync({
@@ -32,7 +31,9 @@ import { ReportModule } from "./jobs/report/report.module";
     OrderModule,
     ReportModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(RequestLoggingMiddleware).forRoutes("*");
+  }
+}
