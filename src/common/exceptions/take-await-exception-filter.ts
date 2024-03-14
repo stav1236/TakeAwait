@@ -1,10 +1,19 @@
 import { Request, Response } from "express";
-import { Catch, ArgumentsHost, HttpException, ExceptionFilter, HttpStatus } from "@nestjs/common";
+import {
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  ExceptionFilter,
+  HttpStatus,
+  Logger,
+} from "@nestjs/common";
 
 import { getDateWithTimeString } from "../utilities/date-utils";
 
 @Catch()
 export class TakeAwaitExceptionFilter implements ExceptionFilter {
+  private logger = new Logger("AllExceptionsFilter");
+
   catch(exception: any, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -25,6 +34,8 @@ export class TakeAwaitExceptionFilter implements ExceptionFilter {
       message: exception.message || "Internal server error",
       statusCode: status,
     };
+
+    this.logger.error(`Exception: ${JSON.stringify(errorResponse)}`, exception.stack);
 
     response.status(status).json(errorResponse);
   }

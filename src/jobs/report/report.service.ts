@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { Cron, CronExpression } from "@nestjs/schedule";
 
 import { OrderService } from "src/modules/Order/order.service";
@@ -9,12 +9,14 @@ import { getDateWithTimeString } from "src/common/utilities/date-utils";
 
 @Injectable()
 export class ReportService {
+  private readonly logger = new Logger(ReportService.name);
+
   constructor(
     private readonly orderService: OrderService,
     private readonly restaurantService: RestaurantService
   ) {}
 
-  @Cron(CronExpression.EVERY_10_HOURS)
+  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
   async createFolder(): Promise<void> {
     const curDate = new Date();
     const timeString = getDateWithTimeString(curDate);
@@ -34,14 +36,14 @@ export class ReportService {
             );
 
             fs.writeFileSync(restaurantReportFileName, JSON.stringify(orderData));
-            console.log(`File report "${restaurantReportFileName}" created successfully.`);
+            this.logger.log(`File report "${restaurantReportFileName}" created successfully.`);
           } catch (error) {
-            console.error(`Error creating file: ${error}`);
+            this.logger.error(`Error creating file: ${error}`);
           }
         })
       );
     } catch (error) {
-      console.error(`Error creating folder: ${error}`);
+      this.logger.error(`Error creating folder: ${error}`);
     }
   }
 }
