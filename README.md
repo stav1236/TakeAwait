@@ -1,73 +1,77 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# TakeAwait
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Server-side project for restaurant order management.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Usage
 
-## Description
+### Prerequisites
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Before running the project, ensure you have the following installed:
 
-## Installation
+- [Node.js](https://nodejs.org/) (includes npm)
 
-```bash
-$ npm install
-```
+### Running the Project
 
-## Running the app
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/stav1236/TakeAwait.git
+    ```
 
-```bash
-# development
-$ npm run start
+2. **Navigate to the TakeAwait folder:**
+    ```bash
+    cd TakeAwait
+    ```
 
-# watch mode
-$ npm run start:dev
+3. **Install dependencies:**
+    ```bash
+    npm i
+    ```
 
-# production mode
-$ npm run start:prod
-```
+4. **Run the project:**
+    - **Development mode:**
+    ```bash
+    npm run start
+    ```
+    - **Watch mode:**
+    ```bash
+    npm run start:dev
+    ```
+    - **Production mode:**
+    ```bash
+    npm run start:prod
+    ```
 
-## Test
+## Implementation
+The project is implemented using Nest framework TypeScript.
 
-```bash
-# unit tests
-$ npm run test
+## Environment Variables
+For each runtime environment, we need to create a suitable environment file named `.env.${process.env.NODE_ENV}`. For example, for running the development environment, we would create a file named `.env.development`. 
 
-# e2e tests
-$ npm run test:e2e
+The following environment variables are required:
 
-# test coverage
-$ npm run test:cov
-```
+- `PORT`: Specifies the port on which the server will run.
+- `DB_URL`: Specifies the address of the DB server.
 
-## Support
+These environment variables ensure proper configuration and connectivity for the server-side project.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## API Documentation
+The system uses Swagger to document the functionality of the project. Swagger can be accessed by running the project and navigating to the path `/api-doc`.
 
-## Stay in touch
+## Folder Structure
+- **common**
+  - **config**: Contains configuration files for the project, such as database configuration, logging configuration, etc.
+  - **exceptions**: Houses custom exception classes used in the project.
+  - **middlewares**: Contains middleware functions that are executed before or after route handlers.
+  - **models**: Contains data models or schemas used throughout the application.
+  - **pipes**: Houses custom pipe classes used for data transformation or validation.
+  - **utilities**: Contains utility functions or helper classes used across different parts of the project.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- **jobs**: Contains scripts or modules responsible for performing background tasks or scheduled jobs, such as generating reports, sending emails, etc.
+
+- **modules**: Represents the core business logic of the application, typically organized by feature or entity. Each module may contain its own set of controllers, services, DTOs (Data Transfer Objects), repositories, etc. This folder structure allows for a modular and scalable architecture.
+
+This folder structure helps in maintaining a well-organized codebase, improving code readability, and facilitating code reuse across different parts of the application.
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under the [MIT](https://choosealicense.com/licenses/mit/) License.
